@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kids Matching Game - Audio & Picture Quiz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Fredoka:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Animated Background Elements -->
+    <div class="bg-decorations">
+        <div class="floating-shape shape-1">⭐</div>
+        <div class="floating-shape shape-2">🌈</div>
+        <div class="floating-shape shape-3">✨</div>
+        <div class="floating-shape shape-4">🎨</div>
+        <div class="floating-shape shape-5">🎵</div>
+        <div class="floating-shape shape-6">💫</div>
+        <div class="floating-shape shape-7">🌟</div>
+        <div class="floating-shape shape-8">🎪</div>
+    </div>
+
+    <!-- Tutorial Overlay (shown on first visit) -->
+    <div id="tutorialOverlay" class="tutorial-overlay">
+        <div class="tutorial-modal">
+            <div class="tutorial-mascot">
+                <div class="mascot-body">🦊</div>
+                <div class="mascot-speech-bubble">
+                    <p id="tutorialText">Hi there! I'm Felix the Fox! Let me show you how to play!</p>
+                </div>
+            </div>
+            <div class="tutorial-content">
+                <div class="tutorial-steps">
+                    <div class="tutorial-step active" data-step="1">
+                        <div class="step-animation">
+                            <div class="demo-audio-card">
+                                <span class="demo-play">▶</span>
+                                <span>Track 1</span>
+                            </div>
+                            <div class="demo-click-indicator">👆 Click!</div>
+                        </div>
+                        <p><strong>Step 1:</strong> Click the play button to hear a voice description</p>
+                    </div>
+                    <div class="tutorial-step" data-step="2">
+                        <div class="step-animation">
+                            <div class="demo-drag">
+                                <div class="demo-audio-card dragging">
+                                    <span class="demo-play">▶</span>
+                                    <span>Track 1</span>
+                                </div>
+                                <div class="demo-arrow">➡️</div>
+                                <div class="demo-picture-card">
+                                    <div class="demo-face">👤</div>
+                                </div>
+                            </div>
+                        </div>
+                        <p><strong>Step 2:</strong> Drag the audio card to the matching picture</p>
+                    </div>
+                    <div class="tutorial-step" data-step="3">
+                        <div class="step-animation">
+                            <div class="demo-success">
+                                <span class="demo-checkmark">✅</span>
+                                <span class="demo-stars">⭐⭐⭐</span>
+                            </div>
+                        </div>
+                        <p><strong>Step 3:</strong> Match all the voices to win! Use hints if you're stuck 💡</p>
+                    </div>
+                </div>
+                <div class="tutorial-progress-dots">
+                    <span class="dot active" data-step="1"></span>
+                    <span class="dot" data-step="2"></span>
+                    <span class="dot" data-step="3"></span>
+                </div>
+            </div>
+            <div class="tutorial-buttons">
+                <button id="tutorialPrev" class="tutorial-btn tutorial-btn-secondary" disabled>← Back</button>
+                <button id="tutorialNext" class="tutorial-btn tutorial-btn-primary">Next →</button>
+                <button id="tutorialSkip" class="tutorial-btn tutorial-btn-skip">Skip Tutorial</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Celebration Overlay -->
+    <div id="celebrationOverlay" class="celebration-overlay hidden">
+        <div class="confetti-container" id="confettiContainer"></div>
+        <div class="celebration-content">
+            <div class="celebration-mascot">🦊</div>
+            <h2 class="celebration-title">Amazing Job!</h2>
+            <div class="celebration-stars">
+                <span class="star star-1">⭐</span>
+                <span class="star star-2">⭐</span>
+                <span class="star star-3">⭐</span>
+            </div>
+            <p class="celebration-message" id="celebrationMessage">You completed the level!</p>
+            <button id="celebrationContinue" class="celebration-btn">Continue →</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Mascot Helper (floating) -->
+        <div class="mascot-helper" id="mascotHelper">
+            <div class="mascot-character">🦊</div>
+            <div class="mascot-tip" id="mascotTip">
+                <p>Click play to listen!</p>
+            </div>
+        </div>
+
+        <header>
+            <h1><span class="title-emoji">🎮</span><span class="title-text">Match the Voice to the Face!</span><span
+                    class="title-emoji">🎮</span></h1>
+            <p class="subtitle">Listen to each description and drag it to the matching picture</p>
+            <div class="score-board">
+                <div class="score-item">
+                    <span class="score-icon">🎯</span>
+                    <span class="score-label">Score</span>
+                    <span class="score-value" id="score">0</span>
+                </div>
+                <div class="score-item">
+                    <span class="score-icon">🎲</span>
+                    <span class="score-label">Tries</span>
+                    <span class="score-value" id="attempts">0</span>
+                </div>
+            </div>
+
+            <!-- Sound Toggle -->
+            <div class="sound-controls">
+                <button id="bgMusicToggle" class="sound-btn" title="Toggle Background Music">
+                    <span class="sound-on">🎵</span>
+                    <span class="sound-off hidden">🔇</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Sticky Audio Player -->
+        <div id="stickyPlayer" class="sticky-player hidden">
+            <div class="sticky-player-content">
+                <div class="sticky-info">
+                    <span class="sticky-icon">🎧</span>
+                    <div class="sticky-text">
+                        <strong>Now Playing:</strong>
+                        <span id="stickyAudioLabel">Track 1</span>
+                    </div>
+                    <div class="audio-visualizer">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                    </div>
+                </div>
+                <button id="stickyReplayBtn" class="sticky-replay-btn">🔄 Replay</button>
+                <button id="stickyStopBtn" class="sticky-stop-btn">⏹ Stop</button>
+            </div>
+            <audio id="stickyAudio"></audio>
+        </div>
+
+        <!-- Level Selector -->
+        <div class="level-selector">
+            <h3>Choose Your Level:</h3>
+            <div class="level-buttons">
+                <button class="level-btn active" data-level="1">
+                    <div class="level-stars">⭐</div>
+                    <span class="level-number">1</span>
+                    <span class="level-name">Beginner</span>
+                    <span class="level-kids">8 Kids</span>
+                    <div class="level-lock hidden">🔒</div>
+                </button>
+                <button class="level-btn" data-level="2">
+                    <div class="level-stars">⭐⭐</div>
+                    <span class="level-number">2</span>
+                    <span class="level-name">Intermediate</span>
+                    <span class="level-kids">8 Kids</span>
+                    <div class="level-lock">🔒</div>
+                </button>
+                <button class="level-btn" data-level="3">
+                    <div class="level-stars">⭐⭐⭐</div>
+                    <span class="level-number">3</span>
+                    <span class="level-name">Advanced</span>
+                    <span class="level-kids">6 Kids</span>
+                    <div class="level-lock">🔒</div>
+                </button>
+                <button class="level-btn" data-level="4">
+                    <div class="level-stars">👑</div>
+                    <span class="level-number">🏆</span>
+                    <span class="level-name">Ultimate Challenge</span>
+                    <span class="level-kids">All 22 Kids!</span>
+                    <div class="level-lock">🔒</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-info">
+                <span>Level <span id="currentLevel">1</span> Progress:</span>
+                <span><span id="currentMatches">0</span> / <span id="totalInLevel">8</span> matched</span>
+            </div>
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill">
+                    <div class="progress-shine"></div>
+                </div>
+                <div class="progress-markers" id="progressMarkers"></div>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <!-- Audio Descriptions Section (Left side - Draggable items) -->
+            <div class="audio-section">
+                <h2>🔊 Audio Descriptions</h2>
+                <div id="audioItems" class="audio-items"></div>
+            </div>
+
+            <!-- Pictures Section (Right side - Drop zones) -->
+            <div class="pictures-section">
+                <h2>📷 Pictures</h2>
+                <div id="pictureItems" class="picture-items"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="resetBtn" class="btn btn-reset">
+                <span class="btn-icon">🔄</span>
+                <span class="btn-text">Reset Level</span>
+            </button>
+            <button id="checkAllBtn" class="btn btn-check">
+                <span class="btn-icon">✅</span>
+                <span class="btn-text">Check Progress</span>
+            </button>
+            <button id="helpBtn" class="btn btn-help">
+                <span class="btn-icon">❓</span>
+                <span class="btn-text">Help</span>
+            </button>
+        </div>
+
+        <div id="levelComplete" class="level-complete-message hidden">
+            <h2>🎉 Level Complete! 🎉</h2>
+            <p>You matched all <span id="levelKidsCount">8</span> kids!</p>
+            <p>Accuracy: <span id="levelAccuracy">100%</span></p>
+            <button id="nextLevelBtn" class="btn next-level-btn">➡️ Next Level</button>
+        </div>
+
+        <div id="completionMessage" class="completion-message hidden">
+            <h2>🎉 Congratulations! 🎉</h2>
+            <p>You've completed all matches!</p>
+            <p>Final Score: <span id="finalScore"></span></p>
+        </div>
+    </div>
+
+    <!-- Audio elements for feedback -->
+    <audio id="correctSound" preload="auto">
+        <source src="audio/feedback/correct.wav" type="audio/wav">
+    </audio>
+    <audio id="wrongSound" preload="auto">
+        <source src="audio/feedback/wrong.wav" type="audio/wav">
+    </audio>
+    <audio id="bgMusic" loop preload="auto">
+        <source src="audio/feedback/background.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
